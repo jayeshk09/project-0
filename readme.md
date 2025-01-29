@@ -1,1 +1,3 @@
-# trying to build resume builder app
+# TrustCV
+
+## your own resume building app
