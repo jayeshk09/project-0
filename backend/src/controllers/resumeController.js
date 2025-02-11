@@ -2,6 +2,8 @@
 import { Resume } from "../models/resume.models.js";
 import { fetchLeetCodeStats, fetchCodeforcesStats } from "../utils/apiHelpers.js";
 import { generateResumePDF } from "../utils/pdfGenerator.js";
+import fs from "fs";
+import path from "path";
 
 export const createResume = async (req, res) => {
   try {
@@ -44,19 +46,23 @@ export const getResumes = async (req, res) => {
       const { id } = req.params;
       const userId = req.user.id;
   
-      // Find the resume
       const resume = await Resume.findOne({ _id: id, user: userId });
       if (!resume) {
         return res.status(404).json({ message: "Resume not found" });
       }
   
-      // Generate the PDF
+      // Generate PDF
       const pdfBytes = await generateResumePDF(resume);
   
-      // Send the PDF as a response
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", `attachment; filename=${resume.personalDetails.name}_Resume.pdf`);
-      res.send(pdfBytes);
+      // Define file path
+      const filePath = path.join("public", "temp", `${resume.personalDetails.name}_Resume.pdf`);
+  
+      // Save PDF to the server
+      fs.writeFileSync(filePath, pdfBytes);
+  
+      // Send response with file URL
+      res.status(200).json({ downloadUrl: `/temp/${resume.personalDetails.name}_Resume.pdf` });
+  
     } catch (error) {
       res.status(500).json({ message: "Something went wrong", error: error.message });
     }

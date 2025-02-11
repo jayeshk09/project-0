@@ -142,5 +142,6 @@ export const generateResumePDF = async (resume) => {
 
   // Save the PDF
   const pdfBytes = await pdfDoc.save();
-  return pdfBytes;
+  return Buffer.from(pdfBytes); // Ensure it's returned as a buffer
+  
 };
